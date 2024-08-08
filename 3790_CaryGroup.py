@@ -1,14 +1,11 @@
 import csv
 import requests
-import json
 import datetime, time
 import urllib3
 import re
 from bs4 import BeautifulSoup
 from lxml import etree
 from deep_translator import GoogleTranslator
-import sys
-import html
 
 
 def initlize_values():

@@ -26,22 +26,16 @@ df = pd.read_csv('2830_Roady_werkstattdb.csv',sep=",")
 # df.columns = df.iloc[0]  # Setze die erste Zeile als Spaltennamen
 # df.index = df.iloc[:, 0]  # Setze die erste Spalte als Index
 
-
 print('with duplicates: ', len(df))
 # print(df.head())
 
-# streets = df["street"]
-# dupl = df[streets.isin(streets[streets.duplicated()])].sort_values("street")
-# dupl = pd.concat(g for _, g in df.groupby("phone") if len(g) > 1)
-# print(dupl)
 
-
-duplikate_df = df[df.duplicated(keep=False)]
-print(duplikate_df.sort_values(by='name').head(10))
+duplikate_df = df[df.duplicated()]
+# print(duplikate_df.sort_values(by='name').head(10))
 print('duplicates: ', len(duplikate_df.sort_values(by='name')))
 
 df_ohne_duplikate = df.drop_duplicates()
-print(df_ohne_duplikate.sort_values(by='name').head(10))
+# print(df_ohne_duplikate.sort_values(by='name').head(10))
 print('ohne duplicates', len(df_ohne_duplikate.sort_values(by='name')))
 
 

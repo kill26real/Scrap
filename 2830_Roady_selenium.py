@@ -1,12 +1,5 @@
 import csv
-import requests
-from bs4 import BeautifulSoup
-import json
 import datetime, time
-import urllib3
-import datetime, time
-import urllib3
-import re
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, WebDriverException, ElementNotInteractableException, ElementNotVisibleException, ElementClickInterceptedException
 from selenium.webdriver import Keys
@@ -16,6 +9,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
+import pandas as pd
 
 
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -24,11 +18,14 @@ url = 'https://www.roady.fr/'
 driver.maximize_window()
 driver.get(url)
 
-# with open('2830_Roady_werkstattdb.csv', 'w', newline='', encoding="utf-8") as csvfile:
-#    csv_writer = csv.writer(csvfile)
-#    csv_writer.writerow(
-#        ['abc', 'country', 'target_groups', 'contracts', 'name', 'street', 'city', 'postal_code', 'phone',
-#         'fax', 'web', 'email', 'services', 'latitude', 'longitude', 'garage_id', 'sources'])
+file_name = 'NONE'
+# file_name = '2830_Roady'
+
+with open(f'{file_name}_werkstattdb.csv', 'w', newline='', encoding="utf-8") as csvfile:
+   csv_writer = csv.writer(csvfile)
+   csv_writer.writerow(
+       ['abc', 'country', 'target_groups', 'contracts', 'name', 'street', 'city', 'postal_code', 'phone',
+        'fax', 'web', 'email', 'services', 'latitude', 'longitude', 'garage_id', 'sources'])
 
 
 def get_info(web):
@@ -77,7 +74,7 @@ def get_info(web):
     #     print("Keine Koordinaten in der URL gefunden.")
 
 
-    with open('2830_Roady_werkstattdb.csv', 'a', newline='', encoding="utf-8") as csvfile:
+    with open(f'{file_name}_werkstattdb.csv', 'a', newline='', encoding="utf-8") as csvfile:
         csv_writer = csv.writer(csvfile)
         csv_writer.writerow(
             ['abc', 'FR', 'IAM Autocenter', 'Roady', name, street, city, plz, phone, '', web, '', service, lat,
@@ -177,7 +174,24 @@ for place in places:
         find_objects(place)
 
 
+pd.set_option('display.max_columns', None)
+pd.set_option('display.expand_frame_repr', False)
 
+df = pd.read_csv(f'{file_name}_werkstattdb.csv', sep=",")
+
+# df.columns = df.iloc[0]  # Setze die erste Zeile als Spaltennamen
+# df.index = df.iloc[:, 0]  # Setze die erste Spalte als Index
+
+print('with duplicates: ', len(df))
+# print(df.head())
+duplicate_df = df[df.duplicated(keep=False)]
+# duplicate_df = df[df.duplicated()]
+# print(duplicate_df.sort_values(by='name').head(10))
+print('duplicates: ', len(duplicate_df.sort_values(by='name')))
+
+df_ohne_duplicate = df.drop_duplicates()
+# print(df_ohne_duplicate.sort_values(by='name').head(10))
+print('ohne duplicates', len(df_ohne_duplicate.sort_values(by='name')))
 
 
 
