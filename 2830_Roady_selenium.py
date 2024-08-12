@@ -21,7 +21,7 @@ driver.get(url)
 file_name = 'NONE'
 # file_name = '2830_Roady'
 
-with open(f'{file_name}_werkstattdb.csv', 'w', newline='', encoding="utf-8") as csvfile:
+with open(f'{file_name}_row_werkstattdb.csv', 'w', newline='', encoding="utf-8") as csvfile:
    csv_writer = csv.writer(csvfile)
    csv_writer.writerow(
        ['abc', 'country', 'target_groups', 'contracts', 'name', 'street', 'city', 'postal_code', 'phone',
@@ -43,12 +43,12 @@ def get_info(web):
     address = driver.find_element(By.XPATH, '//*[@id="content-column"]/div/div[1]/div/div[3]/div[2]/div/div[1]/address').text.splitlines()
     name = address[0]
     street = address[-3]
-    plz = address[-2][:5]
+    plz = str(address[-2][:5])
     city = address[-2][6:]
     print('name', name)
-    print(street)
-    print(plz)
-    print(city)
+    print('street', street)
+    print('plz', plz)
+    print('city', city)
 
     phone_info = driver.find_element(By.CLASS_NAME, 'store-phone.hidden-md.hidden-sm.hidden-xs').text.split('.')
     phone = ''.join(phone_info)
@@ -74,7 +74,7 @@ def get_info(web):
     #     print("Keine Koordinaten in der URL gefunden.")
 
 
-    with open(f'{file_name}_werkstattdb.csv', 'a', newline='', encoding="utf-8") as csvfile:
+    with open(f'{file_name}_row_werkstattdb.csv', 'a', newline='', encoding="utf-8") as csvfile:
         csv_writer = csv.writer(csvfile)
         csv_writer.writerow(
             ['abc', 'FR', 'IAM Autocenter', 'Roady', name, street, city, plz, phone, '', web, '', service, lat,
@@ -176,16 +176,14 @@ for place in places:
 
 pd.set_option('display.max_columns', None)
 pd.set_option('display.expand_frame_repr', False)
+pd.set_option('display.max_rows', None)
 
-df = pd.read_csv(f'{file_name}_werkstattdb.csv', sep=",")
-
-# df.columns = df.iloc[0]  # Setze die erste Zeile als Spaltennamen
-# df.index = df.iloc[:, 0]  # Setze die erste Spalte als Index
+df = pd.read_csv(f'{file_name}_row_werkstattdb.csv', sep=",")
 
 print('with duplicates: ', len(df))
 # print(df.head())
-duplicate_df = df[df.duplicated(keep=False)]
-# duplicate_df = df[df.duplicated()]
+
+duplicate_df = df[df.duplicated()]
 # print(duplicate_df.sort_values(by='name').head(10))
 print('duplicates: ', len(duplicate_df.sort_values(by='name')))
 
@@ -193,9 +191,9 @@ df_ohne_duplicate = df.drop_duplicates()
 # print(df_ohne_duplicate.sort_values(by='name').head(10))
 print('ohne duplicates', len(df_ohne_duplicate.sort_values(by='name')))
 
+df_ohne_duplicate['postal_code'] = df_ohne_duplicate['postal_code'].apply(lambda x: f"{x:05}")
 
-
-
+df_ohne_duplicate.to_csv(f'{file_name}_werkstattdb.csv')
 
 
 

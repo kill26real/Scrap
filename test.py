@@ -1,43 +1,32 @@
-import csv
-import requests
-import json
-import datetime, time
-import urllib3
-import re
-from bs4 import BeautifulSoup
-from lxml import etree
-import sys
-import html
 import pandas as pd
 
 
-# with open('2830_Roady_werkstattdb.csv', mode='r', newline='', encoding='utf-8') as csvfile:
-#     csvreader = csv.reader(csvfile)
-#     for row in csvreader:
-#         print(row)
-
-# iloc
-
 pd.set_option('display.max_columns', None)
 pd.set_option('display.expand_frame_repr', False)
+pd.set_option('display.max_rows', None)
+# pd.set_option('display.max_colwidth', None)  # Keine Begrenzung der Spaltenbreite
 
-df = pd.read_csv('2830_Roady_werkstattdb.csv',sep=",")
+df = pd.read_csv('2831_E.LECLERC_werkstattdb.csv', sep=",")
 
-# df.columns = df.iloc[0]  # Setze die erste Zeile als Spaltennamen
-# df.index = df.iloc[:, 0]  # Setze die erste Spalte als Index
+# df['postal_code'] = df['postal_code'].apply(lambda x: f"{x:05}")
 
-print('with duplicates: ', len(df))
-# print(df.head())
-
-
-duplikate_df = df[df.duplicated()]
-# print(duplikate_df.sort_values(by='name').head(10))
-print('duplicates: ', len(duplikate_df.sort_values(by='name')))
-
-df_ohne_duplikate = df.drop_duplicates()
-# print(df_ohne_duplikate.sort_values(by='name').head(10))
-print('ohne duplicates', len(df_ohne_duplikate.sort_values(by='name')))
+# del df['Unnamed: 0']
+# df = df.drop(120, axis=0)
+# df = df.drop(119, axis=0)
 
 
+print(df['phone'].dtype)
 
+print(df)
 
+# df_new = df.drop_duplicates()
+# #
+# df_copy = df_new.copy()
+# df_copy['postal_code'] = df_copy['postal_code'].astype('string')
+# df_copy['postal_code'] = df_copy['postal_code'].apply(lambda x: '0' + str(x) if len(str(x)) < 5 else x).astype('string')
+#
+# print(df_copy['postal_code'])
+# print('TYPE', df_copy['postal_code'].dtype)
+#
+#
+# df.to_csv('2830_Roady_werkstattdb.csv')
