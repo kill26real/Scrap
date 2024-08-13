@@ -10,6 +10,9 @@ from selenium.webdriver.common.action_chains import ActionChains
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
 import pandas as pd
+import os
+from deep_translator import GoogleTranslator
+from test_input import send_data_csv
 
 
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -18,10 +21,10 @@ url = 'https://www.roady.fr/'
 driver.maximize_window()
 driver.get(url)
 
-file_name = 'NONE'
-# file_name = '2830_Roady'
+# file_name = 'NONE'
+file_name = '2830_Roady'
 
-with open(f'{file_name}_row_werkstattdb.csv', 'w', newline='', encoding="utf-8") as csvfile:
+with open(f'{file_name}_raw_werkstattdb.csv', 'w', newline='', encoding="utf-8") as csvfile:
    csv_writer = csv.writer(csvfile)
    csv_writer.writerow(
        ['abc', 'country', 'target_groups', 'contracts', 'name', 'street', 'city', 'postal_code', 'phone',
@@ -56,32 +59,16 @@ def get_info(web):
 
     services = driver.find_elements(By.CLASS_NAME, 'service')
     for serv in services:
-        service += serv.text + ' | '
+        service = service + GoogleTranslator(source='auto', target='en').translate(serv.text) + ' | '
     service = service[:-2]
     print('services', service)
 
-
-    # map = driver.find_element(By.XPATH, '//*[@id="content-column"]/div/div[1]/div/div[3]/div[1]/div[2]/div[1]/a')
-    # href = map.get_attribute('href')
-    # print('map link', href)
-    # pattern = re.compile(r'@(.*?),(.*?)/')
-    # match = pattern.search(href)
-    # if match:
-    #     lat = match.group(1)
-    #     lng = match.group(2)
-    #     print(f"Latitude: {lat}, Longitude: {lng}")
-    # else:
-    #     print("Keine Koordinaten in der URL gefunden.")
-
-
-    with open(f'{file_name}_row_werkstattdb.csv', 'a', newline='', encoding="utf-8") as csvfile:
+    with open(f'{file_name}_raw_werkstattdb.csv', 'a', newline='', encoding="utf-8") as csvfile:
         csv_writer = csv.writer(csvfile)
         csv_writer.writerow(
             ['abc', 'FR', 'IAM Autocenter', 'Roady', name, street, city, plz, phone, '', web, '', service, lat,
              lng, '', 'https://www.roady.fr/'])
     print('-------------------------------------------------------------------------')
-
-
 
 def cookies():
     try:
@@ -92,8 +79,6 @@ def cookies():
         print("Cookies akzeptiert")
     except Exception as e:
         print(f"Fehler beim Akzeptieren der Cookies")
-
-
 
 def find_objects(place):
     try:
@@ -173,29 +158,27 @@ for place in places:
         driver.back()
         find_objects(place)
 
-
-pd.set_option('display.max_columns', None)
-pd.set_option('display.expand_frame_repr', False)
-pd.set_option('display.max_rows', None)
-
-df = pd.read_csv(f'{file_name}_row_werkstattdb.csv', sep=",")
-
-print('with duplicates: ', len(df))
-# print(df.head())
-
-duplicate_df = df[df.duplicated()]
-# print(duplicate_df.sort_values(by='name').head(10))
-print('duplicates: ', len(duplicate_df.sort_values(by='name')))
+df = pd.read_csv(f'{file_name}_raw_werkstattdb.csv', sep=",", skipinitialspace=True,  dtype={'postal_code': 'string'})
 
 df_ohne_duplicate = df.drop_duplicates()
-# print(df_ohne_duplicate.sort_values(by='name').head(10))
-print('ohne duplicates', len(df_ohne_duplicate.sort_values(by='name')))
-
 df_ohne_duplicate['postal_code'] = df_ohne_duplicate['postal_code'].apply(lambda x: f"{x:05}")
 
-df_ohne_duplicate.to_csv(f'{file_name}_werkstattdb.csv')
+df_ohne_duplicate['postal_code'] = df_ohne_duplicate['postal_code'].astype(pd.StringDtype())
+df_ohne_duplicate['phone'] = df_ohne_duplicate['phone'].astype(pd.StringDtype())
+df_ohne_duplicate['fax'] = df_ohne_duplicate['fax'].astype(pd.StringDtype())
 
+df_ohne_duplicate['phone'] = df_ohne_duplicate['phone'].str.replace(" ", "")
+df_ohne_duplicate['fax'] = df_ohne_duplicate['fax'].str.replace(" ", "")
 
+df_ohne_duplicate.to_csv(f'{file_name}_werkstattdb.csv', index=False)
+
+new_datei = f'{file_name}_werkstattdb.csv'
+alt_datei = f'{file_name}_raw_werkstattdb.csv'
+
+if os.path.exists(alt_datei) and os.path.exists(new_datei):
+    os.remove(alt_datei)
+
+send_data_csv(new_datei)
 
 
 

@@ -6,7 +6,9 @@ from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
-
+import pandas as pd
+import os
+from test_input import send_data_csv
 
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
 wait = WebDriverWait(driver, 10)
@@ -14,7 +16,7 @@ url = 'https://www.auto.leclerc/centre-auto'
 driver.maximize_window()
 driver.get(url)
 
-with open('2831_E.LECLERC_werkstattdb.csv', 'w', newline='', encoding="utf-8") as csvfile:
+with open('2831_E.LECLERC_raw_werkstattdb.csv', 'w', newline='', encoding="utf-8") as csvfile:
    csv_writer = csv.writer(csvfile)
    csv_writer.writerow(
        ['abc', 'country', 'target_groups', 'contracts', 'name', 'street', 'city', 'postal_code', 'phone',
@@ -40,7 +42,7 @@ def get_info(web, garage_id):
     print('address', address)
     print('name', name)
 
-    plz = address[-2][:5]
+    plz = str(address[-2][:5])
     city = address[-2][6:]
     phone = address[-1]
 
@@ -55,7 +57,7 @@ def get_info(web, garage_id):
     print(phone)
 
 
-    with open('2831_E.LECLERC_werkstattdb.csv', 'a', newline='', encoding="utf-8") as csvfile:
+    with open('2831_E.LECLERC_raw_werkstattdb.csv', 'a', newline='', encoding="utf-8") as csvfile:
         csv_writer = csv.writer(csvfile)
         csv_writer.writerow(
             ['abc', 'FR', 'IAM Autocenter', 'E.LECLERC', name, street, city, plz, phone, '', web, '', service, lat,
@@ -73,9 +75,7 @@ def cookies():
         print(f"Fehler beim Akzeptieren der Cookies")
 
 cookies()
-
 garages = driver.find_elements(By.CLASS_NAME, 'woosmap-tableview-cell')
-
 print('Len', len(garages))
 i = 0
 for garage in garages:
@@ -88,9 +88,27 @@ for garage in garages:
     all_info.click()
     time.sleep(1)
     link = driver.current_url
-    # garage_id = garage.get_attribute('id')
     print('link', link)
     print('id', garage_id)
     get_info(link, garage_id)
     driver.back()
 
+df = pd.read_csv('2831_E.LECLERC_raw_werkstattdb.csv', sep=",", skipinitialspace=True,  dtype={'postal_code': 'string'})
+
+df['postal_code'] = df['postal_code'].apply(lambda x: f"{x:05}")
+df['postal_code'] = df['postal_code'].astype(pd.StringDtype())
+df['phone'] = df['phone'].astype(pd.StringDtype())
+df['fax'] = df['fax'].astype('string')
+
+df['phone'] = df['phone'].str.replace(" ", "")
+df['fax'] = df['fax'].str.replace(" ", "")
+
+df.to_csv(f'2831_E.LECLERC_werkstattdb.csv', index=False)
+
+new_datei = '2831_E.LECLERC_werkstattdb.csv'
+alt_datei = '2831_E.LECLERC_raw_werkstattdb.csv'
+
+if os.path.exists(alt_datei) and os.path.exists(new_datei):
+    os.remove(alt_datei)
+
+send_data_csv(new_datei)
