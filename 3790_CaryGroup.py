@@ -93,7 +93,7 @@ for garage in garages:
 
     link = 'https://rydsbilglas.se/' + garage_dienst.find('a').get('href')
     email = dom.xpath('//*[@id="hitta-verkstad-desktop"]/div[4]/p[1]/a')[0].text
-    phone = dom.xpath('//*[@id="hitta-verkstad-desktop"]/div[4]/p[1]/text()')[0].strip().replace('.', '-')
+    phone = dom.xpath('//*[@id="hitta-verkstad-desktop"]/div[4]/p[1]/text()')[0].strip().replace('.', '')
     street = dom.xpath('//*[@id="hitta-verkstad-desktop"]/div[4]/p[2]')[0].text
     addresse = str(dom.xpath('//*[@id="hitta-verkstad-desktop"]/div[4]/p[2]/text()[2]')[0]).replace(' ', '')
 

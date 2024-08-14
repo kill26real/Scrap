@@ -1,13 +1,3 @@
-import csv
-import requests
-import json
-import datetime, time
-import urllib3
-import re
-from bs4 import BeautifulSoup
-from lxml import etree
-import sys
-import html
 import pandas as pd
 
 # df.columns = df.iloc[0]  # Setze die erste Zeile als Spaltennamen
@@ -31,9 +21,6 @@ import pandas as pd
 # df_ohne_duplicate = df.drop_duplicates()
 # print(df_ohne_duplicate.sort_values(by='name').head(10))
 # print('ohne duplicates', len(df_ohne_duplicate.sort_values(by='name')))
-
-
-
 
 
 pd.set_option('display.max_columns', None)
