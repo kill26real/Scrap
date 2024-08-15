@@ -13,7 +13,6 @@ import pandas as pd
 
 # df = df.reset_index(drop=True)
 
-
 # duplicate_df = df[df.duplicated()]
 # print(duplicate_df.sort_values(by='name').head(10))
 # print('duplicates: ', len(duplicate_df.sort_values(by='name')))

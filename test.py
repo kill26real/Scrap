@@ -6,7 +6,7 @@ pd.set_option('display.expand_frame_repr', False)
 pd.set_option('display.max_rows', None)
 # pd.set_option('display.max_colwidth', None)  # Keine Begrenzung der Spaltenbreite
 
-df = pd.read_csv('2780_Wurth_werkstattdb.csv', sep=",", dtype={'postal_code': 'string'})
+df = pd.read_csv('2831_E.LECLERC_werkstattdb.csv', sep=",", dtype={'postal_code': 'string'})
 
 # df['postal_code'] = df['postal_code'].apply(lambda x: f"{x:05}")
 

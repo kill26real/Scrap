@@ -16,11 +16,11 @@ url = 'https://www.auto.leclerc/centre-auto'
 driver.maximize_window()
 driver.get(url)
 
-with open('2831_E.LECLERC_raw_werkstattdb.csv', 'w', newline='', encoding="utf-8") as csvfile:
-   csv_writer = csv.writer(csvfile)
-   csv_writer.writerow(
-       ['abc', 'country', 'target_groups', 'contracts', 'name', 'street', 'city', 'postal_code', 'phone',
-        'fax', 'web', 'email', 'services', 'latitude', 'longitude', 'garage_id', 'sources'])
+# with open('2831_E.LECLERC_raw_werkstattdb.csv', 'w', newline='', encoding="utf-8") as csvfile:
+#    csv_writer = csv.writer(csvfile)
+#    csv_writer.writerow(
+#        ['abc', 'country', 'target_groups', 'contracts', 'name', 'street', 'city', 'postal_code', 'phone',
+#         'fax', 'web', 'email', 'services', 'latitude', 'longitude', 'garage_id', 'sources'])
 
 
 def get_info(web, garage_id):
@@ -44,7 +44,7 @@ def get_info(web, garage_id):
 
     plz = str(address[-2][:5])
     city = address[-2][6:]
-    phone = address[-1]
+    phone = str(address[-1])
 
     try:
         if address[-4] != 'OÙ NOUS TROUVER':

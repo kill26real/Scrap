@@ -7,6 +7,10 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import os
 from test_input import send_data_csv
+# from cae_import import *
+
+raw_datei_name = '2780_Wurth_raw_werkstattdb.csv'
+datei_name = '2780_Wurth_werkstattdb.csv'
 
 
 def get_url(url):
@@ -21,7 +25,7 @@ def get_url(url):
             print("Failed to retrieve the web page")
             return 'error'
 
-with open('2780_Wurth_raw_werkstattdb.csv', 'w', newline='', encoding="utf-8") as csvfile:
+with open(raw_datei_name, 'w', newline='', encoding="utf-8") as csvfile:
    csv_writer = csv.writer(csvfile)
    csv_writer.writerow(
        ['abc', 'country', 'target_groups', 'contracts', 'name', 'street', 'city', 'postal_code', 'phone',
@@ -48,14 +52,14 @@ for loc in locations:
     lat = loc[8]
     lng = loc[9]
 
-    with open('2780_Wurth_raw_werkstattdb.csv', 'a', newline='', encoding="utf-8") as csvfile:
+    with open(raw_datei_name, 'a', newline='', encoding="utf-8") as csvfile:
         csv_writer = csv.writer(csvfile)
         csv_writer.writerow(
             ['abc', 'ESP', 'Direct Marketer', 'Würth', name, street, city, plz, phone, '', '', email, '', lat,
              lng, garage_id, 'https://www.wurth.fi/'])
 
 
-df = pd.read_csv('2780_Wurth_raw_werkstattdb.csv', sep=",", skipinitialspace=True,  dtype={'postal_code': 'string'})
+df = pd.read_csv(raw_datei_name, sep=",", skipinitialspace=True,  dtype={'postal_code': 'string'})
 
 df['postal_code'] = df['postal_code'].apply(lambda x: f"{x:05}")
 df['postal_code'] = df['postal_code'].astype(pd.StringDtype())
@@ -64,12 +68,10 @@ df['phone'] = df['phone'].astype(pd.StringDtype())
 df['phone'] = df['phone'].str.replace(" ", "")
 
 
-df.to_csv(f'2780_Wurth_werkstattdb.csv', index=False)
+df.to_csv(datei_name, index=False)
 
-new_datei = '2780_Wurth_werkstattdb.csv'
-alt_datei = '2780_Wurth_raw_werkstattdb.csv'
 
-if os.path.exists(alt_datei) and os.path.exists(new_datei):
-    os.remove(alt_datei)
+if os.path.exists(raw_datei_name) and os.path.exists(datei_name):
+    os.remove(raw_datei_name)
 
 # send_data_csv(new_datei)

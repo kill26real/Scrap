@@ -9,6 +9,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
+import re
 import pandas as pd
 import os
 from deep_translator import GoogleTranslator
@@ -21,8 +22,8 @@ url = 'https://www.roady.fr/'
 driver.maximize_window()
 driver.get(url)
 
-# file_name = 'NONE'
-file_name = '2830_Roady'
+file_name = 'NONE'
+# file_name = '2830_Roady'
 
 with open(f'{file_name}_raw_werkstattdb.csv', 'w', newline='', encoding="utf-8") as csvfile:
    csv_writer = csv.writer(csvfile)
@@ -43,6 +44,16 @@ def get_info(web):
 
     time.sleep(1)
 
+    latlng = str(driver.find_element(By.XPATH, '//*[@id="map-2"]/div/div[3]/div[13]/div/a').get_attribute('href'))
+    print('latlng', latlng)
+    pattern = r'll=([0-9.-]+),([0-9.-]+)'
+    match = re.search(pattern, latlng)
+    if match:
+        lat = match.group(1)
+        lng = match.group(2)
+    print('lat', lat)
+    print('lng', lng)
+
     address = driver.find_element(By.XPATH, '//*[@id="content-column"]/div/div[1]/div/div[3]/div[2]/div/div[1]/address').text.splitlines()
     name = address[0]
     street = address[-3]
@@ -62,13 +73,13 @@ def get_info(web):
         service = service + GoogleTranslator(source='auto', target='en').translate(serv.text) + ' | '
     service = service[:-2]
     print('services', service)
+    print('-------------------------------------------------------------------------')
 
     with open(f'{file_name}_raw_werkstattdb.csv', 'a', newline='', encoding="utf-8") as csvfile:
         csv_writer = csv.writer(csvfile)
         csv_writer.writerow(
             ['abc', 'FR', 'IAM Autocenter', 'Roady', name, street, city, plz, phone, '', web, '', service, lat,
              lng, '', 'https://www.roady.fr/'])
-    print('-------------------------------------------------------------------------')
 
 def cookies():
     try:
@@ -132,6 +143,7 @@ places = ('Marmande', 'Cholet', 'Reims', 'Grenoble')
 for place in places:
     cookies()
     find_objects(place)
+    time.sleep(1)
     elements = driver.find_elements(By.CLASS_NAME, 'storelocatorSearch__store')
     print('Len', len(elements))
 
@@ -178,7 +190,7 @@ alt_datei = f'{file_name}_raw_werkstattdb.csv'
 if os.path.exists(alt_datei) and os.path.exists(new_datei):
     os.remove(alt_datei)
 
-send_data_csv(new_datei)
+# send_data_csv(new_datei)
 
 
 
