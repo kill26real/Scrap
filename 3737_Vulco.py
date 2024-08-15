@@ -8,6 +8,7 @@ from deep_translator import GoogleTranslator
 import pandas as pd
 import os
 from test_input import send_data_csv
+from lxml import etree
 
 
 def initlize_values():
@@ -74,7 +75,7 @@ for garage in garages:
     contact_classes = {'col-lg-6', 'mb-lg-0', 'mb-4'}
     def has_all_classes(tag):
         return tag.has_attr('class') and contact_classes.issubset(tag['class'])
-    contact = soup2.find(has_all_classes)
+    contact = soup2.find_all(has_all_classes)[0]
 
     address = [re.sub(r'\s+', ' ', x).strip() for x in contact.find('p').text.splitlines()]
     if len(address) < 4:
@@ -93,9 +94,9 @@ for garage in garages:
 
     contact2 = contact.find_all('li')
     phone = str(contact2[0].text).strip()
-    if contact2[1].find('i', class_='fa-print'):
+    if contact.find('i', class_='fa-print'):
         fax = str(contact2[1].text).strip().replace('.', '')
-    if contact2[1].find('i', class_='fa-mobile'):
+    if contact.find('i', class_='fa-mobile'):
         phone += f' | {str(contact2[1].text).strip()}'
     print('phone', phone)
     print('fax', fax)
@@ -107,6 +108,17 @@ for garage in garages:
             services = services + GoogleTranslator(source='auto', target='en').translate(service.find('img', class_='service-icon').get('alt')) + ' | '
     services = services[:-1]
 
+    latlng = soup2.find_all('script', type='text/javascript')[2].text
+    pattern = r'\s*parseFloat\("(-?\d+\.\d+)"\),\s*\s*parseFloat\("(-?\d+\.\d+)"\)'
+    matches = re.search(pattern, latlng)
+    if matches:
+        lat = matches.group(1)
+        lng = matches.group(2)
+        print("Latitude:", lat)
+        print("Longitude:", lng)
+    else:
+        print('no latlng')
+
     print('services', services)
     print('-------------------------------------------------------------------------------------------')
 
@@ -117,7 +129,7 @@ for garage in garages:
              lng, '', 'https://www.vulco.es/'])
 
 
-df = pd.read_csv('3737_Vulco_werkstattdb.csv', sep=",", skipinitialspace=True,  dtype={'postal_code': 'string'})
+df = pd.read_csv('3737_Vulco_raw_werkstattdb.csv', sep=",", skipinitialspace=True,  dtype={'postal_code': 'string'})
 
 df['postal_code'] = df['postal_code'].apply(lambda x: f"{x:05}")
 df['postal_code'] = df['postal_code'].astype(pd.StringDtype())
@@ -138,4 +150,4 @@ alt_datei = '3737_Vulco_raw_werkstattdb.csv'
 if os.path.exists(alt_datei) and os.path.exists(new_datei):
     os.remove(alt_datei)
 
-send_data_csv(new_datei)
+# send_data_csv(new_datei)

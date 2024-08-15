@@ -46,15 +46,20 @@ def get_info(web, garage_id):
     city = address[-2][6:]
     phone = address[-1]
 
-    if address[-4] != 'OÙ NOUS TROUVER':
-        street = address[-4] + address[-3]
-    else:
-        street = address[-3]
+    try:
+        if address[-4] != 'OÙ NOUS TROUVER':
+            street = address[-4] + address[-3]
+        else:
+            street = address[-3]
+    except IndexError:
+        plz = str(address[-1][:5])
+        city = address[-1][6:]
+        phone = ''
 
     print('info', street)
-    print(plz)
-    print(city)
-    print(phone)
+    print('plz', plz)
+    print('city', city)
+    print('phone', phone)
 
 
     with open('2831_E.LECLERC_raw_werkstattdb.csv', 'a', newline='', encoding="utf-8") as csvfile:
@@ -111,4 +116,4 @@ alt_datei = '2831_E.LECLERC_raw_werkstattdb.csv'
 if os.path.exists(alt_datei) and os.path.exists(new_datei):
     os.remove(alt_datei)
 
-send_data_csv(new_datei)
+# send_data_csv(new_datei)
