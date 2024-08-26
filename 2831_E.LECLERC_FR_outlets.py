@@ -44,9 +44,9 @@ def get_info(url, headers, data):
         print('nummer ', i)
         info = outlet['properties']
         name = info['name']
-        store_id = info['store_id']
+        garage_id = info['store_id']
         print('name', name)
-        print('store_id', store_id)
+        print('store_id', garage_id)
 
         contact = info['contact']
         email = contact['email']
@@ -58,7 +58,6 @@ def get_info(url, headers, data):
         fax = ''
         firstname = ''
         lastName = ''
-        garage_id = ''
         services = ''
 
         address = info['address']
@@ -77,9 +76,8 @@ def get_info(url, headers, data):
         print('--------------------------------------------------------------')
 
         success = fill_csv('2831_E.LECLARC_FR_outlets', '2831', 'FR', 'IAM Autocenter', name, street, city, plz, '', phone,
-                           fax, web, email, '', firstname, lastName \
-                           , '', '', 'https://www.auto.leclerc/', lat, lng, '0', garage_id, services, 'IAM Autocenter',
-                           'E.LECLERC')
+                           fax, web, email, '', firstname, lastName, '', '', 'https://www.auto.leclerc/', lat, lng, '0',
+                           garage_id, services, 'IAM Autocenter', 'E.LECLERC')
 
 get_info(url, headers, data)
 get_info(url2, headers, data2)
