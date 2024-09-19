@@ -8,8 +8,6 @@ import pandas as pd
 import os
 from cae_import import *
 
-raw_datei_name = '2780_Wurth_raw_werkstattdb.csv'
-datei_name = '2780_Wurth_werkstattdb.csv'
 
 
 def get_url(url):
@@ -24,9 +22,9 @@ def get_url(url):
             print("Failed to retrieve the web page")
             return 'error'
 
-with open('2780_Würth_FI_outlets_werkstattdb.csv', 'w', newline='') as csvfile:
-            csv_writer = csv.writer(csvfile)
-            csv_writer.writerow(['abc','country','target_groups','contracts','name', 'street', 'city' ,'postal_code', 'phone','fax', 'web','email', 'services', 'latitude', 'longitude','garage_id','source_id'])
+# with open('2780_Würth_FI_outlets_werkstattdb.csv', 'w', newline='') as csvfile:
+#             csv_writer = csv.writer(csvfile)
+#             csv_writer.writerow(['abc','country','target_groups','contracts','name', 'street', 'city' ,'postal_code', 'phone','fax', 'web','email', 'services', 'latitude', 'longitude','garage_id','source'])
 
 
 urllib3.disable_warnings()
@@ -39,8 +37,8 @@ locations_str = pattern.group(1).replace("null", "None")
 locations = eval(locations_str)
 
 for loc in locations:
-    plz=fax =name =garage_id= email =web =contact=contracts=target_groups=contact_name=outlets_type=preselect=hq=siret=firstname=lastName=\
-            position=phone=address=street=city=hq=services=contact=tg=phone_temp=lat=lng=tg=contract=''
+    # plz=fax =name =garage_id= email =web =contact=contracts=target_groups=contact_name=outlets_type=preselect=hq=siret=firstname=lastName=\
+    #         position=phone=address=street=city=hq=services=contact=tg=phone_temp=lat=lng=tg=contract=''
     garage_id = str(loc[0])
     name = loc[1]
     street = loc[2]

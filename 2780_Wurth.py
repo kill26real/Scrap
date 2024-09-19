@@ -6,12 +6,13 @@ import re
 from bs4 import BeautifulSoup
 import pandas as pd
 import os
-from test_input import send_data_csv
+from test_input import send_data_csv, send_data_raw
 # from cae_import import *
 
 raw_datei_name = '2780_Wurth_raw_werkstattdb.csv'
 datei_name = '2780_Wurth_werkstattdb.csv'
 
+OUTPUT = []
 
 def get_url(url):
     response = requests.get(url)
@@ -25,11 +26,11 @@ def get_url(url):
             print("Failed to retrieve the web page")
             return 'error'
 
-with open(raw_datei_name, 'w', newline='', encoding="utf-8") as csvfile:
-   csv_writer = csv.writer(csvfile)
-   csv_writer.writerow(
-       ['abc', 'country', 'target_groups', 'contracts', 'name', 'street', 'city', 'postal_code', 'phone',
-        'fax', 'web', 'email', 'services', 'latitude', 'longitude', 'garage_id', 'sources'])
+# with open(raw_datei_name, 'w', newline='', encoding="utf-8") as csvfile:
+#    csv_writer = csv.writer(csvfile)
+#    csv_writer.writerow(
+#        ['abc', 'country', 'target_groups', 'contracts', 'name', 'street', 'city', 'postal_code', 'phone',
+#         'fax', 'web', 'email', 'services', 'latitude', 'longitude', 'garage_id', 'source'])
 
 
 urllib3.disable_warnings()
@@ -49,29 +50,51 @@ for loc in locations:
     city = loc[4]
     phone = str(loc[5]).replace(' ', '')
     email = loc[7]
-    lat = loc[8]
-    lng = loc[9]
+    lat = str(loc[8])
+    lng = str(loc[9])
 
-    with open(raw_datei_name, 'a', newline='', encoding="utf-8") as csvfile:
-        csv_writer = csv.writer(csvfile)
-        csv_writer.writerow(
-            ['abc', 'ESP', 'Direct Marketer', 'Würth', name, street, city, plz, phone, '', '', email, '', lat,
-             lng, garage_id, 'https://www.wurth.fi/'])
+    OUTPUT.append({
+        'abc': 'abc',
+        'country': 'FI',
+        'target_groups': 'Direct Marketer',
+        'contracts': 'Würth',
+        'name': name,
+        'street': street,
+        'city': city,
+        'postal_code': plz,
+        'phone': phone,
+        'fax': '',
+        'web': '',
+        'email': email,
+        'services': '',
+        'latitude': lat,
+        'longitude': lng,
+        'garage_id': garage_id,
+        'source': 'https://www.wurth.fi/'
+    })
+
+send_data_raw(OUTPUT)
+
+    # with open(raw_datei_name, 'a', newline='', encoding="utf-8") as csvfile:
+    #     csv_writer = csv.writer(csvfile)
+    #     csv_writer.writerow(
+    #         ['abc', 'ESP', 'Direct Marketer', 'Würth', name, street, city, plz, phone, '', '', email, '', lat,
+    #          lng, garage_id, 'https://www.wurth.fi/'])
 
 
-df = pd.read_csv(raw_datei_name, sep=",", skipinitialspace=True,  dtype={'postal_code': 'string'})
-
-df['postal_code'] = df['postal_code'].apply(lambda x: f"{x:05}")
-df['postal_code'] = df['postal_code'].astype(pd.StringDtype())
-
-df['phone'] = df['phone'].astype(pd.StringDtype())
-df['phone'] = df['phone'].str.replace(" ", "")
-
-
-df.to_csv(datei_name, index=False)
-
-
-if os.path.exists(raw_datei_name) and os.path.exists(datei_name):
-    os.remove(raw_datei_name)
+# df = pd.read_csv(raw_datei_name, sep=",", skipinitialspace=True,  dtype={'postal_code': 'string'})
+#
+# df['postal_code'] = df['postal_code'].apply(lambda x: f"{x:05}")
+# df['postal_code'] = df['postal_code'].astype(pd.StringDtype())
+#
+# df['phone'] = df['phone'].astype(pd.StringDtype())
+# df['phone'] = df['phone'].str.replace(" ", "")
+#
+#
+# df.to_csv(datei_name, index=False)
+#
+#
+# if os.path.exists(raw_datei_name) and os.path.exists(datei_name):
+#     os.remove(raw_datei_name)
 
 # send_data_csv(new_datei)

@@ -13,7 +13,8 @@ import re
 import pandas as pd
 import os
 from deep_translator import GoogleTranslator
-from test_input import send_data_csv
+from test_input import send_data_csv, send_data_raw
+# from cae_import import *
 
 
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -22,15 +23,16 @@ url = 'https://www.roady.fr/'
 driver.maximize_window()
 driver.get(url)
 
-file_name = 'NONE'
-# file_name = '2830_Roady'
+# with open('2830_Roady_FR_outlets.csv', 'w', newline='', encoding="utf-8") as csvfile:
+#    csv_writer = csv.writer(csvfile)
+#    csv_writer.writerow(
+#        ['abc', 'country', 'target_groups', 'contracts', 'name', 'street', 'city', 'postal_code', 'phone', 'fax', 'web',
+#         'email', 'services', 'latitude', 'longitude', 'garage_id', 'source_id'])
 
-with open(f'{file_name}_raw_werkstattdb.csv', 'w', newline='', encoding="utf-8") as csvfile:
-   csv_writer = csv.writer(csvfile)
-   csv_writer.writerow(
-       ['abc', 'country', 'target_groups', 'contracts', 'name', 'street', 'city', 'postal_code', 'phone',
-        'fax', 'web', 'email', 'services', 'latitude', 'longitude', 'garage_id', 'sources'])
+OUTPUT = []
 
+# OUTPUT.append(['abc', 'country', 'target_groups', 'contracts', 'name', 'street', 'city', 'postal_code', 'phone',
+#                'fax', 'web', 'email', 'services', 'latitude', 'longitude', 'garage_id', 'sources'])
 
 def get_info(web):
     mail = ""
@@ -75,11 +77,40 @@ def get_info(web):
     print('services', service)
     print('-------------------------------------------------------------------------')
 
-    with open(f'{file_name}_raw_werkstattdb.csv', 'a', newline='', encoding="utf-8") as csvfile:
-        csv_writer = csv.writer(csvfile)
-        csv_writer.writerow(
-            ['abc', 'FR', 'IAM Autocenter', 'Roady', name, street, city, plz, phone, '', web, '', service, lat,
-             lng, '', 'https://www.roady.fr/'])
+    fax = ''
+    email = ''
+    firstname = ''
+    lastName = ''
+    garage_id = ''
+
+    OUTPUT.append({
+        'abc': 'abc',
+        'country': 'FR',
+        'target_groups': 'IAM Autocenter',
+        'contracts': 'Roady',
+        'name': name,
+        'street': street,
+        'city': city,
+        'postal_code': plz,
+        'phone': phone,
+        'fax': fax,
+        'web': link,
+        'email': email,
+        'services': service,
+        'latitude': lat,
+        'longitude': lng,
+        'garage_id': '',
+        'source': 'https://www.roady.fr/'
+    })
+    # print(OUTPUT)
+
+
+    # success = fill_csv('2830_Roady_FR_outlets', '2830', 'FR', 'IAM Autocenter', name, street, city,
+    #                    plz, '', phone,
+    #                    fax, web, email, '', firstname, lastName \
+    #                    , '', '', 'https://www.roady.fr/', lat, lng, '0', garage_id, service,
+    #                    'IAM Garage marketing system',
+    #                    'Roady')
 
 def cookies():
     try:
@@ -170,25 +201,24 @@ for place in places:
         driver.back()
         find_objects(place)
 
-df = pd.read_csv(f'{file_name}_raw_werkstattdb.csv', sep=",", skipinitialspace=True,  dtype={'postal_code': 'string'})
+send_data_raw(OUTPUT)
 
-df_ohne_duplicate = df.drop_duplicates()
-df_ohne_duplicate['postal_code'] = df_ohne_duplicate['postal_code'].apply(lambda x: f"{x:05}")
-
-df_ohne_duplicate['postal_code'] = df_ohne_duplicate['postal_code'].astype(pd.StringDtype())
-df_ohne_duplicate['phone'] = df_ohne_duplicate['phone'].astype(pd.StringDtype())
-df_ohne_duplicate['fax'] = df_ohne_duplicate['fax'].astype(pd.StringDtype())
-
-df_ohne_duplicate['phone'] = df_ohne_duplicate['phone'].str.replace(" ", "")
-df_ohne_duplicate['fax'] = df_ohne_duplicate['fax'].str.replace(" ", "")
-
-df_ohne_duplicate.to_csv(f'{file_name}_werkstattdb.csv', index=False)
-
-new_datei = f'{file_name}_werkstattdb.csv'
-alt_datei = f'{file_name}_raw_werkstattdb.csv'
-
-if os.path.exists(alt_datei) and os.path.exists(new_datei):
-    os.remove(alt_datei)
+# df = pd.read_csv('2830_Roady_FR_outlets.csv', sep=",", skipinitialspace=True,  dtype={'postal_code': 'string'})
+#
+# df_ohne_duplicate = df.drop_duplicates()
+# df_ohne_duplicate['postal_code'] = df_ohne_duplicate['postal_code'].apply(lambda x: f"{x:05}")
+#
+# df_ohne_duplicate['postal_code'] = df_ohne_duplicate['postal_code'].astype(pd.StringDtype())
+# df_ohne_duplicate['phone'] = df_ohne_duplicate['phone'].astype(pd.StringDtype())
+# df_ohne_duplicate['fax'] = df_ohne_duplicate['fax'].astype(pd.StringDtype())
+#
+# df_ohne_duplicate['phone'] = df_ohne_duplicate['phone'].str.replace(" ", "")
+# df_ohne_duplicate['fax'] = df_ohne_duplicate['fax'].str.replace(" ", "")
+#
+# df_ohne_duplicate.to_csv('2830_Roady_FR_outlets_new.csv', index=False)
+#
+# if os.path.exists(alt_datei) and os.path.exists(new_datei):
+#     os.remove(alt_datei)
 
 # send_data_csv(new_datei)
 

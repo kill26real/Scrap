@@ -2,7 +2,7 @@ import requests
 import json
 import csv
 
-LOCAL_SERVER_URL = 'http://192.168.58.99:5000/receive_data'
+LOCAL_SERVER_URL = 'http://192.168.58.78:5000/receive_data'
 
 def send_data_csv(csv_path):
     """
