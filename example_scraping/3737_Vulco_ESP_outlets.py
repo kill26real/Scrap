@@ -56,6 +56,7 @@ garage_classes = {'col-12', 'col-md-6', 'col-lg-4', 'mb-4'}
 def has_all_classes(tag):
     return tag.has_attr('class') and garage_classes.issubset(tag['class'])
 garages = soup.find_all(has_all_classes)
+
 print('len', len(garages))
 
 i = 0

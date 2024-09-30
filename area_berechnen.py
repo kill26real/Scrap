@@ -1,25 +1,14 @@
 import requests
 import json
 import csv
-import re
-import datetime, time
-from bs4 import BeautifulSoup
 import urllib3
-# from cae_import import *
-# from test_input import send_data_raw
 import pandas as pd
 import geopandas as gpd
-from shapely.geometry import shape, Polygon
-from shapely import wkt
 import pycountry
 from tqdm import tqdm
 import math
-import io
-from datetime import datetime
-import gzip
-import pickle
 import osmnx as ox
-from shapely.geometry import Point
+
 from osmnx._errors import InsufficientResponseError
 
 
@@ -370,3 +359,82 @@ for garage in tqdm(my_liste, desc='my_liste'):
         csv_writer = csv.writer(csvfile)
         csv_writer.writerow(
             [street, city, plz, country, lat, lng, area, num_vertices, area_liste, area_min, area_median, place, web])
+
+
+# def get_geometry(building, lat, lng):
+#     epsg_code = int(get_epsg_code(lat, lng))
+#
+#     building_polygon = building.iloc[0].geometry
+#     gdf2 = gpd.GeoDataFrame([1], geometry=[building_polygon], crs="EPSG:4326")
+#     gdf_utm = gdf2.to_crs(epsg=epsg_code)  # 32633 - mitteleuropa
+#
+#     area_punkt = round(gdf_utm['geometry'].area[0], 2)
+#
+#     try:
+#         area = f"{area_punkt:.2f}".replace('.', ',')
+#         num_eckpunkten = str(len(building_polygon.exterior.coords) - 1)
+#     except AttributeError:
+#         area, num_eckpunkten = None
+#
+#     return area, num_eckpunkten
+
+
+
+# def get_area(garage):
+#     lat = garage['latitude']
+#     lng = garage['longitude']
+#     plz = garage['postal_code']
+#     street = garage['street']
+#     city = garage['city']
+#     iso2 = garage['country']
+#     country = pycountry.countries.get(alpha_2=iso2).name
+#     place_name = street.strip() + ', ' + city
+#
+#     # print('\niso2: ', iso2)
+#     # print('country: ', country)
+#     # print('latitude: ' + str(lat))
+#     # print('longitude: ' + str(lng))
+#     # print('street: ' + street)
+#     # print('city: ' + city)
+#     # print('plz: : ' + plz)
+#     # print('place name: ', place_name)
+#     try:
+#         building = ox.features_from_place(place_name, tags={'building': True})
+#         area, num_eckpunkten = get_geometry(building, lat, lng)
+#         umkreis = '0'
+#     except (TypeError, InsufficientResponseError):
+#         try:
+#             building = ox.features_from_point((lat, lng), tags={'building': True}, dist=10)
+#             area, num_eckpunkten = get_geometry(building, lat, lng)
+#             umkreis = '10'
+#         except InsufficientResponseError:
+#             try:
+#                 building = ox.features_from_point((lat, lng), tags={'building': True}, dist=20)
+#                 area, num_eckpunkten = get_geometry(building, lat, lng)
+#                 umkreis = '20'
+#             except InsufficientResponseError:
+#                 try:
+#                     building = ox.features_from_point((lat, lng), tags={'building': True}, dist=30)
+#                     area, num_eckpunkten = get_geometry(building, lat, lng)
+#                     umkreis = '30'
+#                 except InsufficientResponseError:
+#                     try:
+#                         building = ox.features_from_point((lat, lng), tags={'building': True}, dist=40)
+#                         area, num_eckpunkten = get_geometry(building, lat, lng)
+#                         umkreis = '40'
+#                     except InsufficientResponseError:
+#                         try:
+#                             building = ox.features_from_point((lat, lng), tags={'building': True}, dist=50)
+#                             area, num_eckpunkten = get_geometry(building, lat, lng)
+#                             umkreis = '50'
+#                         except InsufficientResponseError:
+#                             try:
+#                                 building = ox.features_from_point((lat, lng), tags={'building': True}, dist=100)
+#                                 area, num_eckpunkten = get_geometry(building, lat, lng)
+#                                 umkreis = '100'
+#                             except InsufficientResponseError:
+#                                 area = num_eckpunkten = umkreis = None
+#     if not area:
+#         umkreis = None
+#
+#     return area, umkreis, num_eckpunkten
